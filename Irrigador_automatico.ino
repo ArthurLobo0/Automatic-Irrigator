@@ -38,14 +38,16 @@ void loop() {
   int auxSec = Buttons();
   
   //Serial.print(OnSec);
+  Serial.println(MinMax);
   Serial.println(auxSec);
+  Serial.print("\n");
   delay (20);
   if(t.hour == OnHour && t.min == OnMin && t.sec == OnSec){
     digitalWrite(Relay,HIGH);
     Serial.println("LIGHT ON");
     }
     
-    if(t.hour == OffHour && t.min == OffMin && t.sec == auxSec){
+    if(t.hour == OffHour && t.min == MinMax && t.sec == auxSec){
       digitalWrite(Relay,LOW);
       Serial.println("LIGHT OFF");
     }
@@ -95,7 +97,7 @@ int Buttons(){
 }
  
 int arredonda(){
- if(SecMax >=60){
+ if(SecMax >=60){ //ARRUMAR PQ FICA NEGATIVO QUANDO PASSA DE 0 PRA 59MIN
   MinMax = MinMax + SecMax/60;
   SecMax = SecMax - 60;
   }
