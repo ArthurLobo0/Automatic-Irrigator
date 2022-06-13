@@ -13,27 +13,33 @@ Time t;
  int OffMin = 40;
  int OffSec = 20;
  int buttonPin = A0; 
- int SecMin = 0 ;
- int SecMax = 20;
+ int SecMax ;
+ int MinMax;
+ //int segNr;
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   rtc.begin();
   pinMode(Relay, OUTPUT);
   digitalWrite(Relay, LOW);
+  SecMax = 20;
+  MinMax = 40;
 }
 
 void loop() {
-  t = rtc.getTime();
-  Serial.print(t.hour);
-  Serial.print(" hour(s), ");
-  Serial.print(t.min);
-  Serial.print(" minute(s), ");
-  Serial.print(t.sec);
-  Serial.print(" sec(s), ");
-  Serial.println(" ");
-  delay (1000);
+ // t = rtc.getTime();
+ // Serial.print(t.hour);
+ // Serial.print(" hour(s), ");
+ // Serial.print(t.min);
+  //Serial.print(" minute(s), ");
+  //Serial.print(t.sec);
+  //Serial.print(" sec(s), ");
+  //Serial.println(" ");
+  
   int auxSec = Buttons();
   
+  //Serial.print(OnSec);
+  Serial.println(auxSec);
+  delay (20);
   if(t.hour == OnHour && t.min == OnMin && t.sec == OnSec){
     digitalWrite(Relay,HIGH);
     Serial.println("LIGHT ON");
@@ -47,6 +53,7 @@ void loop() {
 
 int Buttons(){
   int temp = analogRead(buttonPin);
+  //Serial.println(temp);
   if (temp < 100)                     //Lower limit for first button - if below this limit then no button is pushed and LEDs are turned off
   {
     digitalWrite(ledBlue, LOW);
@@ -72,18 +79,24 @@ int Buttons(){
     digitalWrite(ledBlue, HIGH);
     Serial.print("tres");  
   }*/
-  else if(temp < 850)                //Fourth button limit
+  else if(temp < 650)  //850              //Fourth button limit
   {
-    Serial.print("mais 1s\n");
+    //Serial.print("mais 1s\n");
     SecMax +=1;
   }
   else                                //If none of the previous buttons are pressed, then the fifth button must be pressed
   {
-    Serial.print("menos 1 s\n");
+    //Serial.print("menos 1s\n");
     SecMax -=1;
   } 
+  arredonda();
   delay(100);                         //Delay for stability
   return SecMax ;
 }
  
-  
+int arredonda(){
+ if(SecMax >=60){
+  MinMax = MinMax + SecMax/60;
+  SecMax = SecMax - 60;
+  }
+}
