@@ -9,20 +9,23 @@ Time t;
  int OnHour = 23;
  int OnMin =40;
  int OnSec = 0;
- int OffHour = 23;
- int OffMin = 40;
- int OffSec = 20;
+ //int OffHour = 23;
+ //int OffMin = 40;
+ //int OffSec = 20;
+ 
  int buttonPin = A0; 
  int SecMax ;
  int MinMax;
- //int segNr;
+ int HoraMax;
 void setup() {
   Serial.begin(9600);
   rtc.begin();
   pinMode(Relay, OUTPUT);
   digitalWrite(Relay, LOW);
-  SecMax = 20;
+  HoraMax = 23;
   MinMax = 40;
+  SecMax = 20;
+  
 }
 
 void loop() {
@@ -34,71 +37,58 @@ void loop() {
   //Serial.print(t.sec);
   //Serial.print(" sec(s), ");
   //Serial.println(" ");
-  
   int auxSec = Buttons();
-  
-  //Serial.print(OnSec);
-  Serial.println(MinMax);
-  Serial.println(auxSec);
-  Serial.print("\n");
   delay (20);
   if(t.hour == OnHour && t.min == OnMin && t.sec == OnSec){
     digitalWrite(Relay,HIGH);
     Serial.println("LIGHT ON");
     }
-    
-    if(t.hour == OffHour && t.min == MinMax && t.sec == auxSec){
+  if(t.hour == HoraMax && t.min == MinMax && t.sec == auxSec){
       digitalWrite(Relay,LOW);
       Serial.println("LIGHT OFF");
     }
 }
 
-int Buttons(){
+int Buttons(){ //This funtions reads which button is being pressed
   int temp = analogRead(buttonPin);
   //Serial.println(temp);
-  if (temp < 100)                     //Lower limit for first button - if below this limit then no button is pushed and LEDs are turned off
+  if (temp < 100)                  
   {
-    digitalWrite(ledBlue, LOW);
   }
-  /*else if (temp < 150)                //First button limit - if below this limit but above previous limit then the first button is pressed
+  else if(temp < 650)  //850              //Left Button is pressed
   {
-    digitalWrite(ledGreen, LOW);
-    digitalWrite(ledRed, HIGH);
-    digitalWrite(ledBlue, HIGH);
-    Serial.print("um");
-  }
-  else if (temp < 250)                //Second button limit
-  {
-    digitalWrite(ledGreen, HIGH);
-    digitalWrite(ledRed, HIGH);
-    digitalWrite(ledBlue, LOW);
-    Serial.print("dois");
-  }
-  else if (temp < 350)                //Third button limit
-  {
-    digitalWrite(ledGreen, LOW);
-    digitalWrite(ledRed, LOW);
-    digitalWrite(ledBlue, HIGH);
-    Serial.print("tres");  
-  }*/
-  else if(temp < 650)  //850              //Fourth button limit
-  {
-    //Serial.print("mais 1s\n");
     SecMax +=1;
   }
-  else                                //If none of the previous buttons are pressed, then the fifth button must be pressed
+  else                                //Right Button is pressed
   {
-    //Serial.print("menos 1s\n");
     SecMax -=1;
   } 
   arredonda();
-  delay(100);                         //Delay for stability
+  delay(100);                         
   return SecMax ;
 }
  
-int arredonda(){
- if(SecMax >=60){ //ARRUMAR PQ FICA NEGATIVO QUANDO PASSA DE 0 PRA 59MIN
+int arredonda(){ //This function make the correction of the time (>60 seconds or >60 minutes, etc)
+ if(SecMax >=60 ){ 
   MinMax = MinMax + SecMax/60;
   SecMax = SecMax - 60;
+  HoraMax = HoraMax + MinMax/60;
+  if(MinMax >=60) {
+  MinMax = MinMax -60;
+  if(HoraMax >= 24){
+  HoraMax = HoraMax - 24; 
+     }
+    }
+  }
+  if(SecMax < 0){
+    MinMax = MinMax - 1;
+    SecMax = 59;
+    if(MinMax < 0){
+      HoraMax = HoraMax - 1;
+      MinMax = 59;
+  if(HoraMax <0){
+    HoraMax = 23;
+      }
+    }
   }
 }
